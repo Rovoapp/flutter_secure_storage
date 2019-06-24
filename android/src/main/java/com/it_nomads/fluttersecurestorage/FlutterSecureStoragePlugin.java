@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
 import android.util.Log;
+import android.text.TextUtils;
 
 import com.it_nomads.fluttersecurestorage.ciphers.StorageCipher;
 import com.it_nomads.fluttersecurestorage.ciphers.StorageCipher18Implementation;
@@ -26,7 +27,7 @@ public class FlutterSecureStoragePlugin implements MethodCallHandler {
     private final Charset charset;
     private final StorageCipher storageCipher;
     private static final String ELEMENT_PREFERENCES_KEY_PREFIX = "VGhpcyBpcyB0aGUgcHJlZml4IGZvciBhIHNlY3VyZSBzdG9yYWdlCg";
-    private static final String SHARED_PREFERENCES_NAME = "user_preference";
+    private static String SHARED_PREFERENCES_NAME = "user_preference";
 
     public static void registerWith(Registrar registrar) {
         try {
@@ -48,6 +49,8 @@ public class FlutterSecureStoragePlugin implements MethodCallHandler {
 
     @Override
     public void onMethodCall(MethodCall call, Result result) {
+        setPreferencesFromCall(call);
+
         try {
             switch (call.method) {
                 case "write": {
@@ -93,11 +96,19 @@ public class FlutterSecureStoragePlugin implements MethodCallHandler {
         }
     }
 
+    private void setPreferencesFromCall(MethodCall call) {
+        Map arguments = (Map) call.arguments;
+        SHARED_PREFERENCES_NAME = (String) arguments.get("preferences");
+        if (SHARED_PREFERENCES_NAME == null || TextUtils.isEmpty(SHARED_PREFERENCES_NAME)) {
+            SHARED_PREFERENCES_NAME = "user_preference";
+        }
+    }
+
     private String getKeyFromCall(MethodCall call) {
         Map arguments = (Map) call.arguments;
         String rawKey = (String) arguments.get("key");
-        String key = addPrefixToKey(rawKey);
-        return key;
+//        String key = addPrefixToKey(rawKey);
+        return rawKey;
     }
 
     private Map<String, String> readAll() throws Exception {
@@ -151,9 +162,10 @@ public class FlutterSecureStoragePlugin implements MethodCallHandler {
         if (value == null) {
             return null;
         }
-        byte[] data = Base64.decode(value, 0);
-        byte[] result = storageCipher.decrypt(data);
-
-        return new String(result, charset);
+//        byte[] data = Base64.decode(value, 0);
+//        byte[] result = storageCipher.decrypt(data);
+//
+//        return new String(result, charset);
+        return value;
     }
 }
