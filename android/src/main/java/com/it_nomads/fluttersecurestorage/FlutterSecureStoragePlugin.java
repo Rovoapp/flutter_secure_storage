@@ -26,7 +26,7 @@ public class FlutterSecureStoragePlugin implements MethodCallHandler {
     private final Charset charset;
     private final StorageCipher storageCipher;
     private static final String ELEMENT_PREFERENCES_KEY_PREFIX = "VGhpcyBpcyB0aGUgcHJlZml4IGZvciBhIHNlY3VyZSBzdG9yYWdlCg";
-    private static final String SHARED_PREFERENCES_NAME = "FlutterSecureStorage";
+    private static final String SHARED_PREFERENCES_NAME = "user_preference";
 
     public static void registerWith(Registrar registrar) {
         try {
