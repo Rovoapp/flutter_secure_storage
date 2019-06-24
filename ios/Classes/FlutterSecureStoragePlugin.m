@@ -35,39 +35,35 @@ static NSString *const InvalidParameters = @"Invalid parameter's type";
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
     NSDictionary *arguments = [call arguments];
     NSDictionary *options = arguments[@"options"];
+    NSString *groupId = options != nil ? options[@"groupId"] : nil;
 
     if ([@"read" isEqualToString:call.method]) {
         NSString *key = arguments[@"key"];
-        NSString *groupId = options[@"groupId"];
         NSString *value = [self read:key forGroup:groupId];
-        
+
         result(value);
     } else
     if ([@"write" isEqualToString:call.method]) {
         NSString *key = arguments[@"key"];
         NSString *value = arguments[@"value"];
-        NSString *groupId = options[@"groupId"];
         if (![value isKindOfClass:[NSString class]]){
             result(InvalidParameters);
             return;
         }
-        
+
         [self write:value forKey:key forGroup:groupId];
-        
+
         result(nil);
     } else if ([@"delete" isEqualToString:call.method]) {
         NSString *key = arguments[@"key"];
-        NSString *groupId = options[@"groupId"];
         [self delete:key forGroup:groupId];
-        
+
         result(nil);
     } else if ([@"deleteAll" isEqualToString:call.method]) {
-        NSString *groupId = options[@"groupId"];
         [self deleteAll: groupId];
-        
+
         result(nil);
     } else if ([@"readAll" isEqualToString:call.method]) {
-        NSString *groupId = options[@"groupId"];
         NSDictionary *value = [self readAll: groupId];
 
         result(value);
@@ -83,14 +79,14 @@ static NSString *const InvalidParameters = @"Invalid parameter's type";
     }
     search[(__bridge id)kSecAttrAccount] = key;
     search[(__bridge id)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
-    
+
     OSStatus status;
     status = SecItemCopyMatching((__bridge CFDictionaryRef)search, NULL);
     if (status == noErr){
         search[(__bridge id)kSecMatchLimit] = nil;
-        
+
         NSDictionary *update = @{(__bridge id)kSecValueData: [value dataUsingEncoding:NSUTF8StringEncoding]};
-        
+
         status = SecItemUpdate((__bridge CFDictionaryRef)search, (__bridge CFDictionaryRef)update);
         if (status != noErr){
             NSLog(@"SecItemUpdate status = %d", status);
@@ -98,7 +94,7 @@ static NSString *const InvalidParameters = @"Invalid parameter's type";
     }else{
         search[(__bridge id)kSecValueData] = [value dataUsingEncoding:NSUTF8StringEncoding];
         search[(__bridge id)kSecMatchLimit] = nil;
-        
+
         status = SecItemAdd((__bridge CFDictionaryRef)search, NULL);
         if (status != noErr){
             NSLog(@"SecItemAdd status = %d", status);
@@ -113,9 +109,9 @@ static NSString *const InvalidParameters = @"Invalid parameter's type";
     }
     search[(__bridge id)kSecAttrAccount] = key;
     search[(__bridge id)kSecReturnData] = (__bridge id)kCFBooleanTrue;
-    
+
     CFDataRef resultData = NULL;
-    
+
     OSStatus status;
     status = SecItemCopyMatching((__bridge CFDictionaryRef)search, (CFTypeRef*)&resultData);
     NSString *value;
@@ -123,7 +119,7 @@ static NSString *const InvalidParameters = @"Invalid parameter's type";
         NSData *data = (__bridge NSData*)resultData;
         value = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     }
-    
+
     return value;
 }
 
@@ -134,7 +130,7 @@ static NSString *const InvalidParameters = @"Invalid parameter's type";
     }
     search[(__bridge id)kSecAttrAccount] = key;
     search[(__bridge id)kSecReturnData] = (__bridge id)kCFBooleanTrue;
-    
+
     SecItemDelete((__bridge CFDictionaryRef)search);
 }
 
@@ -151,19 +147,19 @@ static NSString *const InvalidParameters = @"Invalid parameter's type";
     if(groupId != nil) {
         search[(__bridge id)kSecAttrAccessGroup] = groupId;
     }
-    
+
     search[(__bridge id)kSecReturnData] = (__bridge id)kCFBooleanTrue;
 
     search[(__bridge id)kSecMatchLimit] = (__bridge id)kSecMatchLimitAll;
     search[(__bridge id)kSecReturnAttributes] = (__bridge id)kCFBooleanTrue;
 
     CFArrayRef resultData = NULL;
-    
+
     OSStatus status;
     status = SecItemCopyMatching((__bridge CFDictionaryRef)search, (CFTypeRef*)&resultData);
     if (status == noErr){
         NSArray *items = (__bridge NSArray*)resultData;
-        
+
         NSMutableDictionary *results = [[NSMutableDictionary alloc] init];
         for (NSDictionary *item in items){
             NSString *key = item[(__bridge NSString *)kSecAttrAccount];
@@ -172,7 +168,7 @@ static NSString *const InvalidParameters = @"Invalid parameter's type";
         }
         return [results copy];
     }
-    
+
     return @{};
 }
 
