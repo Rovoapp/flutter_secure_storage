@@ -35,7 +35,8 @@ static NSString *const InvalidParameters = @"Invalid parameter's type";
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
     NSDictionary *arguments = [call arguments];
     NSDictionary *options = arguments[@"options"];
-    NSString *groupId = options != nil ? options[@"groupId"] : nil;
+    // TODO: fix this (temp disable groupId)
+    NSString *groupId = nil;
 
     if ([@"read" isEqualToString:call.method]) {
         NSString *key = arguments[@"key"];
