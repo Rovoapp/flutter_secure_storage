@@ -134,10 +134,9 @@ public class FlutterSecureStoragePlugin implements MethodCallHandler {
     }
 
     private void write(String key, String value) throws Exception {
-        byte[] result = storageCipher.encrypt(value.getBytes(charset));
         SharedPreferences.Editor editor = preferences.edit();
 
-        editor.putString(key, Base64.encodeToString(result, 0));
+        editor.putString(key, value);
         editor.commit();
     }
 
