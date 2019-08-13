@@ -80,7 +80,7 @@ static NSString *const InvalidParameters = @"Invalid parameter's type";
     }
     search[(__bridge id)kSecAttrAccount] = key;
     search[(__bridge id)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
-    search[(__bridge id)kSecAttrAccessible] = (__bridge id)kSecAttrAccessibleWhenUnlockedThisDeviceOnly;
+    search[(__bridge id)kSecAttrAccessible] = (__bridge id)kSecAttrAccessibleAlways;
     OSStatus status;
     status = SecItemCopyMatching((__bridge CFDictionaryRef)search, NULL);
     if (status == noErr){
